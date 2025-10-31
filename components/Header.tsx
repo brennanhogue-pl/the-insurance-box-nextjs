@@ -203,6 +203,16 @@ export default function Header() {
                 Contact
               </Link>
             </li>
+            <li>
+              <a href="tel:+13852480612" className="nav-link call-button" aria-label="Call us at (385) 248-0612">
+                Call (385) 248-0612
+              </a>
+            </li>
+            <li>
+              <Link href="#contact" className="nav-link cta-button">
+                Get a Quote
+              </Link>
+            </li>
           </ul>
           <button
             className="hamburger"
