@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState, FormEvent, ChangeEvent } from 'react';
 
 export default function Home() {
   return (
@@ -211,23 +212,222 @@ export default function Home() {
             </p>
           </div>
           <div className="contact-content">
-            <form className="contact-form">
-              <div className="form-row">
-                <input type="text" placeholder="First Name" className="form-input" required />
-                <input type="text" placeholder="Last Name" className="form-input" required />
-              </div>
-              <div className="form-row">
-                <input type="email" placeholder="Email" className="form-input" required />
-                <input type="tel" placeholder="Phone" className="form-input" required />
-              </div>
-              <textarea placeholder="Tell us about your insurance needs..." className="form-textarea" rows={5} required></textarea>
-              <button type="submit" className="btn-primary">
-                Request Quote
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </section>
+    </>
+  );
+}
+
+function ContactForm() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 10);
+    if (digits.length > 6) {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    } else if (digits.length > 3) {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    } else if (digits.length > 0) {
+      return `(${digits}`;
+    }
+    return '';
+  };
+
+  const validateField = (name: string, value: string): string => {
+    if (!value.trim()) {
+      return 'This field is required';
+    }
+
+    if (name === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return 'Please enter a valid email address';
+      }
+    }
+
+    if (name === 'phone') {
+      const usPhoneRegex = /^\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+      if (!usPhoneRegex.test(value)) {
+        return 'Please enter a valid phone number';
+      }
+    }
+
+    return '';
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const formattedValue = name === 'phone' ? formatPhone(value) : value;
+
+    setFormData(prev => ({ ...prev, [name]: formattedValue }));
+
+    // Clear error on change
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    if (error) {
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    // Validate all fields
+    const newErrors: Record<string, string> = {};
+    Object.entries(formData).forEach(([key, value]) => {
+      const error = validateField(key, value);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call (replace with actual endpoint later)
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      console.log('Form submission:', {
+        ...formData,
+        meta: {
+          page: window.location.pathname,
+          timestamp: new Date().toISOString(),
+        }
+      });
+
+      setNotification({
+        message: "Thank you! Your quote request has been submitted. We'll contact you within 24 hours.",
+        type: 'success'
+      });
+
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        message: '',
+      });
+
+      // Hide notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    } catch (error) {
+      setNotification({
+        message: 'There was a problem submitting your request. Please try again.',
+        type: 'error'
+      });
+      setTimeout(() => setNotification(null), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      {notification && (
+        <div className={`notification ${notification.type}`} role="alert">
+          {notification.message}
+        </div>
+      )}
+      <form className="contact-form" onSubmit={handleSubmit}>
+        <div className="form-row">
+          <div className="form-field">
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              className={`form-input ${errors.firstName ? 'error' : ''}`}
+              value={formData.firstName}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+              aria-invalid={!!errors.firstName}
+            />
+            {errors.firstName && <span className="field-error">{errors.firstName}</span>}
+          </div>
+          <div className="form-field">
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              className={`form-input ${errors.lastName ? 'error' : ''}`}
+              value={formData.lastName}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+              aria-invalid={!!errors.lastName}
+            />
+            {errors.lastName && <span className="field-error">{errors.lastName}</span>}
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-field">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className={`form-input ${errors.email ? 'error' : ''}`}
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+              aria-invalid={!!errors.email}
+            />
+            {errors.email && <span className="field-error">{errors.email}</span>}
+          </div>
+          <div className="form-field">
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone"
+              className={`form-input ${errors.phone ? 'error' : ''}`}
+              value={formData.phone}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+              aria-invalid={!!errors.phone}
+            />
+            {errors.phone && <span className="field-error">{errors.phone}</span>}
+          </div>
+        </div>
+        <div className="form-field">
+          <textarea
+            name="message"
+            placeholder="Tell us about your insurance needs..."
+            className={`form-textarea ${errors.message ? 'error' : ''}`}
+            rows={5}
+            value={formData.message}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            aria-invalid={!!errors.message}
+          />
+          {errors.message && <span className="field-error">{errors.message}</span>}
+        </div>
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Sending...' : 'Request Quote'}
+        </button>
+      </form>
     </>
   );
 }
