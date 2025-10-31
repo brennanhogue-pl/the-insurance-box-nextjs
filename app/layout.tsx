@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import NavigationEffects from "@/components/NavigationEffects";
 
 const inter = Inter({
   weight: ['300', '400', '500', '600', '700'],
@@ -27,6 +28,7 @@ export default function RootLayout({
         <link rel="icon" href="/the-insurance-box-logo.png" type="image/png" />
       </head>
       <body className={inter.className}>
+        <NavigationEffects />
         <Header />
         <main id="main-content">
           {children}
