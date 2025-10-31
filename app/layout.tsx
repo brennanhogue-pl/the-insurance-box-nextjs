@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NavigationEffects from "@/components/NavigationEffects";
+import ScrollAnimations from "@/components/ScrollAnimations";
 
 const inter = Inter({
   weight: ['300', '400', '500', '600', '700'],
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <NavigationEffects />
+        <ScrollAnimations />
         <Header />
         <main id="main-content">
           {children}
