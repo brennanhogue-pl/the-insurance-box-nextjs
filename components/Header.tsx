@@ -2,11 +2,34 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Handle mobile menu effects
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Lock body scroll
+      document.body.classList.add('menu-open');
+
+      // Handle Escape key
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsMobileMenuOpen(false);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+
+      return () => {
+        document.body.classList.remove('menu-open');
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.classList.remove('menu-open');
+    }
+  }, [isMobileMenuOpen]);
 
   return (
     <>
@@ -227,7 +250,148 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile menu would go here */}
+      {/* Mobile Menu Sheet */}
+      <div
+        className={`menu-sheet ${isMobileMenuOpen ? 'active' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation menu"
+      >
+        <div className="menu-sheet-content">
+          <div className="menu-grid">
+            <Link className="menu-card" href="/life-insurance" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/yellow-lock.png"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Life Insurance</span>
+                <span className="menu-card-desc">Protect your family&apos;s income with flexible options.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/health-insurance" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/blue-megaphone.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Health Insurance</span>
+                <span className="menu-card-desc">Individual & family plans with subsidy guidance.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/medicare" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/yellow-document.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Medicare</span>
+                <span className="menu-card-desc">Navigate Supplement, Advantage, and Part D.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/long-term-care" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/blue-hand-coins.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Long-Term Care</span>
+                <span className="menu-card-desc">Plan for in-home and facility care costs.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/disability-insurance" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/yellow-lock.png"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Disability Insurance</span>
+                <span className="menu-card-desc">Replace income if illness or injury strikes.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/annuities" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/blue-dollar.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Annuities</span>
+                <span className="menu-card-desc">Create guaranteed retirement income streams.</span>
+              </div>
+            </Link>
+            <Link className="menu-card" href="/financial-planning" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/icons/yellow-computer.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="menu-card-icon"
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="menu-card-content">
+                <span className="menu-card-title">Financial Planning</span>
+                <span className="menu-card-desc">Holistic strategies for long-term goals.</span>
+              </div>
+            </Link>
+          </div>
+          <div className="menu-other-links">
+            <Link className="quick-link" href="/#about" onClick={() => setIsMobileMenuOpen(false)}>
+              About
+            </Link>
+            <Link className="quick-link" href="/#contact" onClick={() => setIsMobileMenuOpen(false)}>
+              Contact
+            </Link>
+          </div>
+        </div>
+        <div className="menu-sheet-footer">
+          <Link href="/#contact" className="menu-cta primary" onClick={() => setIsMobileMenuOpen(false)}>
+            Get a Quote
+          </Link>
+          <a href="tel:+13852480612" className="menu-cta secondary" aria-label="Call us at (385) 248-0612">
+            Call
+          </a>
+        </div>
+      </div>
+
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="menu-backdrop"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
     </>
   );
 }
